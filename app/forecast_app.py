@@ -3,6 +3,18 @@ import pandas as pd
 import joblib
 import plotly.express as px
 import plotly.graph_objects as go
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+data_path = os.path.join(
+    BASE_DIR,
+    "data",
+    "Sample - Superstore.csv"
+)
+model_path = os.path.join(
+    BASE_DIR,
+    "models",
+    "sales_forecast_model.pkl"
+)
 st.set_page_config(page_title="Sales Forecast Dashboard", page_icon="📈", layout="wide")
 st.markdown("""
 <style>
@@ -21,7 +33,7 @@ h1 {
 }
 </style>
 """, unsafe_allow_html=True)
-df = pd.read_csv("data/Sample - Superstore.csv", encoding="latin1")
+df = pd.read_csv(data_path, encoding="latin1")
 df["Order Date"] = pd.to_datetime(df["Order Date"])
 st.sidebar.title("📊 Dashboard Filters")
 region = st.sidebar.selectbox("Region", ["All"] + sorted(df["Region"].unique()))
@@ -125,7 +137,7 @@ st.plotly_chart(
     use_container_width=True
 )
 st.subheader("🔮 6-Month Sales Forecast")
-forecast_model = joblib.load("models/sales_forecast_model.pkl")
+forecast_model = joblib.load(model_path)
 future_forecast = forecast_model.forecast(6)
 forecast_df = pd.DataFrame({
     "Month": [
