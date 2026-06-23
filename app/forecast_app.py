@@ -137,8 +137,24 @@ st.plotly_chart(
     use_container_width=True
 )
 st.subheader("🔮 6-Month Sales Forecast")
-forecast_model = joblib.load(model_path)
-future_forecast = forecast_model.forecast(6)
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
+monthly_sales = (
+    filtered_df.groupby(
+        pd.Grouper(
+            key="Order Date",
+            freq="ME"
+        )
+    )["Sales"]
+    .sum()
+)
+hw_model = ExponentialSmoothing(
+    monthly_sales,
+    trend="add",
+    seasonal="add",
+    seasonal_periods=12
+)
+hw_fit = hw_model.fit()
+future_forecast = hw_fit.forecast(6)
 forecast_df = pd.DataFrame({
     "Month": [
         "Month 1",
